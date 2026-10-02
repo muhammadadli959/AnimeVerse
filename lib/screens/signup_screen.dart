@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+
 import '../config/routes.dart';
 import '../widgets/app_scaffold.dart';
+import '../widgets/auth_content_width.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return AppScaffold(
       body: LayoutBuilder(
-          builder: (context, constraints) {
-            final isLargeScreen = constraints.maxWidth > 600;
-            final maxWidth = isLargeScreen ? 400.0 : constraints.maxWidth;
-            return SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  width: maxWidth,
-                  padding: EdgeInsets.all(screenWidth * 0.06),
+        builder: (context, constraints) {
+          final availableWidth = constraints.maxWidth > 0
+              ? constraints.maxWidth
+              : MediaQuery.sizeOf(context).width;
+          final isLargeScreen = availableWidth > 600;
+          final screenWidth = resolveAuthContentWidth(availableWidth);
+          return SingleChildScrollView(
+            child: Center(
+              child: Container(
+                width: screenWidth,
+                padding: EdgeInsets.all(screenWidth * 0.06),
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -28,7 +41,6 @@ class SignUpScreen extends StatelessWidget {
                       SizedBox(height: screenHeight * 0.1),
 
                       // TODO: Add logo here
-
                       SizedBox(height: screenHeight * 0.04),
 
                       // SignUp Title
@@ -57,7 +69,7 @@ class SignUpScreen extends StatelessWidget {
                       SizedBox(height: screenHeight * 0.05),
 
                       // Email TextField
-                      TextField(
+                      TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: TextStyle(
@@ -67,7 +79,9 @@ class SignUpScreen extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white.withValues(alpha: 0.1),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                            borderRadius: BorderRadius.circular(
+                              screenWidth * 0.03,
+                            ),
                             borderSide: BorderSide.none,
                           ),
                           prefixIcon: Icon(
@@ -85,12 +99,21 @@ class SignUpScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                         keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          final email = value?.trim() ?? '';
+                          if (email.isEmpty) return 'Email wajib diisi';
+                          if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                              .hasMatch(email)) {
+                            return 'Masukkan email yang valid';
+                          }
+                          return null;
+                        },
                       ),
 
                       SizedBox(height: screenHeight * 0.02),
 
                       // Password TextField
-                      TextField(
+                      TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Password',
                           labelStyle: TextStyle(
@@ -100,7 +123,9 @@ class SignUpScreen extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white.withValues(alpha: 0.1),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                            borderRadius: BorderRadius.circular(
+                              screenWidth * 0.03,
+                            ),
                             borderSide: BorderSide.none,
                           ),
                           prefixIcon: Icon(
@@ -123,10 +148,18 @@ class SignUpScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                         obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password wajib diisi';
+                          }
+                          if (value.length < 6) {
+                            return 'Password minimal 6 karakter';
+                          }
+                          return null;
+                        },
                       ),
 
                       SizedBox(height: screenHeight * 0.03),
-
 
                       // Sign Up Button
                       SizedBox(
@@ -134,14 +167,17 @@ class SignUpScreen extends StatelessWidget {
                         height: screenHeight * 0.075,
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Implement sign up functionality
+                            if (!_formKey.currentState!.validate()) return;
+                            FocusScope.of(context).unfocus();
                             context.go(AppRoutes.home);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue.withValues(alpha: 0.8),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                              borderRadius: BorderRadius.circular(
+                                screenWidth * 0.03,
+                              ),
                             ),
                             elevation: 5,
                           ),
@@ -167,7 +203,9 @@ class SignUpScreen extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.03,
+                            ),
                             child: Text(
                               'or',
                               style: TextStyle(
@@ -192,7 +230,13 @@ class SignUpScreen extends StatelessWidget {
                         height: screenHeight * 0.075,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // TODO: Implement Google sign up functionality
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Google Sign-In belum terhubung di demo ini.',
+                                ),
+                              ),
+                            );
                           },
                           icon: SvgPicture.asset(
                             'assets/images/google_icon.svg',
@@ -210,11 +254,10 @@ class SignUpScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black45,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                              side: BorderSide(
-                                color: Colors.black45,
-                                width: 1,
+                              borderRadius: BorderRadius.circular(
+                                screenWidth * 0.03,
                               ),
+                              side: BorderSide(color: Colors.black45, width: 1),
                             ),
                             elevation: 3,
                           ),
@@ -224,8 +267,9 @@ class SignUpScreen extends StatelessWidget {
                       SizedBox(height: screenHeight * 0.04),
 
                       // Sign in link
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             "Already have an account? ",
@@ -252,16 +296,13 @@ class SignUpScreen extends StatelessWidget {
                       ),
 
                       SizedBox(height: screenHeight * 0.05),
-
-
                     ],
                   ),
                 ),
-
               ),
-            );
-
-          }
+            ),
+          );
+        },
       ),
     );
   }

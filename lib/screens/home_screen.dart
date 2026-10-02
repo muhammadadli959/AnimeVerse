@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../data/dummy_data.dart';
+import '../models/anime.dart';
 import '../widgets/anime_view.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/genre_list.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+  String _selectedGenre = 'All';
+
+  List<Anime> get _filteredAnime {
+    final query = _searchQuery.trim().toLowerCase();
+    return DummyData.animeList.where((anime) {
+      final matchesTitle = anime.title.toLowerCase().contains(query);
+      final matchesGenre =
+          _selectedGenre == 'All' ||
+          anime.genre
+              .split(',')
+              .map((genre) => genre.trim().toLowerCase())
+              .contains(_selectedGenre.toLowerCase());
+      return matchesTitle && matchesGenre;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,20 +102,21 @@ class HomeScreen extends StatelessWidget {
                     fontSize: screenWidth * 0.04,
                     color: Colors.white,
                   ),
+                  onChanged: (value) => setState(() => _searchQuery = value),
                 ),
-
               ),
-
             ),
-            GenreList(),
+            GenreList(
+              selected: _selectedGenre,
+              onGenreSelected: (genre) =>
+                  setState(() => _selectedGenre = genre),
+            ),
             SizedBox(height: screenHeight * 0.03),
-            const AnimeView(),
+            AnimeView(animeList: _filteredAnime),
             SizedBox(height: screenHeight * 0.025),
-
           ],
         ),
       ),
     );
-
   }
 }

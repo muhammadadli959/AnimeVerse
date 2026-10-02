@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/favorite_store.dart';
 import '../widgets/app_scaffold.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -23,7 +24,6 @@ class DetailScreen extends StatelessWidget {
     this.description = "Asta and Yuno were abandoned at the same church on the same day. Raised together as children, they came to know of the 'Wizard King'—a title given to the strongest mage in the kingdom—and promised that they would compete against each other for the position of the next Wizard King. However, as they grew up, the stark difference between them became evident. While Yuno is able to wield magic with amazing power and control, Asta cannot use magic at all and desperately tries to awaken his powers by training physically. When they reach the age of 15, Yuno is bestowed a spectacular Grimoire with a four-leaf clover, while Asta receives nothing. However, soon after, Yuno is attacked by a person named Lebuty, whose main purpose is to obtain Yuno's Grimoire. Asta tries to fight Lebuty, but he is outmatched. Though without hope and on the brink of defeat, he finds the strength to continue when he hears Yuno's voice. Unleashing his inner emotions in a rage, Asta receives a five-leaf clover Grimoire, a 'Black Clover' giving him enough power to defeat Lebuty. A few days later, the two friends head out into the world, both seeking the same goal—to become the Wizard King! [Written by MAL Rewrite]",
   });
 
-  @override
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -65,10 +65,7 @@ class DetailScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Background image
-                  Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                  ),
+                  Image.asset(imagePath, fit: BoxFit.cover),
                   // Gradient overlay for better text visibility
                   // Gradient overlay for better text visibility
                   Container(
@@ -129,11 +126,9 @@ class DetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
-
           ),
           // Content section
           SliverToBoxAdapter(
@@ -143,7 +138,10 @@ class DetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Rating and Episodes info
-                  Row(
+                  Wrap(
+                    spacing: screenWidth * 0.03,
+                    runSpacing: screenHeight * 0.015,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       // Rating
                       // Rating
@@ -161,7 +159,9 @@ class DetailScreen extends StatelessWidget {
                               offset: Offset(0, screenHeight * 0.005),
                             ),
                           ],
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(
+                            screenWidth * 0.02,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -184,7 +184,6 @@ class DetailScreen extends StatelessWidget {
                         ),
                       ),
 
-                      SizedBox(width: screenWidth * 0.05),
                       // Total Episodes
                       Container(
                         padding: EdgeInsets.symmetric(
@@ -200,7 +199,9 @@ class DetailScreen extends StatelessWidget {
                               offset: Offset(0, screenHeight * 0.005),
                             ),
                           ],
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                          borderRadius: BorderRadius.circular(
+                            screenWidth * 0.02,
+                          ),
                         ),
                         child: Text(
                           '$totalEpisodes Episodes',
@@ -212,45 +213,35 @@ class DetailScreen extends StatelessWidget {
                         ),
                       ),
 
-                      SizedBox(width: screenWidth * 0.05),
                       // Add to Favorites
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.03,
-                          vertical: screenHeight * 0.01,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: screenWidth * 0.02,
-                              offset: Offset(0, screenHeight * 0.005),
+                      AnimatedBuilder(
+                        animation: FavoriteStore.instance,
+                        builder: (context, _) {
+                          final isFavorite = FavoriteStore.instance.contains(
+                            animeId,
+                          );
+                          return FilledButton.icon(
+                            onPressed: () =>
+                                FavoriteStore.instance.toggle(animeId),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: isFavorite
+                                  ? Colors.redAccent
+                                  : const Color(0xFF0b395e),
+                              foregroundColor: Colors.white,
                             ),
-                          ],
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.favorite_border,
-                              color: Colors.white,
-                              size: screenWidth * 0.04,
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                             ),
-                            SizedBox(width: screenWidth * 0.01),
-                            Text(
-                              'Add to Favorites',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenWidth * 0.035,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            label: Text(
+                              isFavorite
+                                  ? 'Remove Favorite'
+                                  : 'Add to Favorites',
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-
                     ],
                   ),
 
@@ -279,29 +270,12 @@ class DetailScreen extends StatelessWidget {
                   ),
 
                   SizedBox(height: screenHeight * 0.03),
-
-
-                  SizedBox(height: screenHeight * 0.015),
-
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: screenWidth * 0.038,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-
-                  SizedBox(height: screenHeight * 0.03),
                 ],
               ),
             ),
           ),
-
         ],
       ),
     );
   }
-
 }

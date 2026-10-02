@@ -5,6 +5,8 @@ class FavoriteAnimeCard extends StatelessWidget {
   final String genre;
   final String rating;
   final String imagePath;
+  final VoidCallback onTap;
+  final VoidCallback onRemove;
 
   const FavoriteAnimeCard({
     super.key,
@@ -12,6 +14,8 @@ class FavoriteAnimeCard extends StatelessWidget {
     required this.genre,
     required this.rating,
     required this.imagePath,
+    required this.onTap,
+    required this.onRemove,
   });
 
   @override
@@ -29,65 +33,73 @@ class FavoriteAnimeCard extends StatelessWidget {
       ),
       color: const Color(0xFF0b395e),
       elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(screenWidth * 0.04),
-              child: Image.asset(
-                imagePath,
-                width: screenWidth * 0.2,
-                height: screenHeight * 0.12,
-                fit: BoxFit.cover,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                child: Image.asset(
+                  imagePath,
+                  width: screenWidth * 0.2,
+                  height: screenHeight * 0.12,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            SizedBox(width: screenWidth * 0.04),
-
-            // content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.045,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.005),
-                  Text(
-                    genre,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.035,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: screenWidth * 0.04),
-                      SizedBox(width: screenWidth * 0.01),
-                      Text(
-                        rating,
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          color: Colors.white,
-                        ),
+              SizedBox(width: screenWidth * 0.04),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
-                ],
-
+                    ),
+                    SizedBox(height: screenHeight * 0.005),
+                    Text(
+                      genre,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                          size: screenWidth * 0.04,
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          rating,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.035,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-          ],
+              IconButton(
+                tooltip: 'Remove from favorites',
+                onPressed: onRemove,
+                icon: const Icon(Icons.favorite, color: Colors.redAccent),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
 }

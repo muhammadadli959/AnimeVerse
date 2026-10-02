@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,8 +5,63 @@ import '../config/routes.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/profile_button.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _displayName = 'IKLC AnimeVerse';
+
+  Future<void> _changeUsername() async {
+    final controller = TextEditingController(text: _displayName);
+    final username = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Change Username'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Username'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(controller.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (username != null && username.isNotEmpty) {
+      setState(() => _displayName = username);
+    }
+  }
+
+  void _showPasswordBackendNotice() {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Change Password'),
+        content: const Text(
+          'Password changes are unavailable until an account service is connected.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +119,7 @@ class ProfileScreen extends StatelessWidget {
 
                   // Display Name / Username
                   Text(
-                    'IKLC AnimeVerse',
+                    _displayName,
                     style: TextStyle(
                       fontSize: screenWidth * 0.055,
                       fontWeight: FontWeight.bold,
@@ -130,9 +184,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.person_outline,
               title: 'Change Username',
               subtitle: 'Update your display name',
-              onTap: () {
-                // Static dummy function
-              },
+              onTap: _changeUsername,
             ),
 
             SizedBox(height: screenHeight * 0.01),
@@ -142,9 +194,7 @@ class ProfileScreen extends StatelessWidget {
               icon: Icons.lock_outline,
               title: 'Change Password',
               subtitle: 'Update your account password',
-              onTap: () {
-                // Static dummy function
-              },
+              onTap: _showPasswordBackendNotice,
             ),
 
             SizedBox(height: screenHeight * 0.03),
@@ -169,7 +219,11 @@ class ProfileScreen extends StatelessWidget {
               title: 'About AnimeVerse',
               subtitle: 'Version 1.0.0',
               onTap: () {
-                // Static dummy function
+                showAboutDialog(
+                  context: context,
+                  applicationName: 'AnimeVerse',
+                  applicationVersion: '1.0.0',
+                );
               },
             ),
 
@@ -181,13 +235,9 @@ class ProfileScreen extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Static dummy function
                   context.go(AppRoutes.signIn);
                 },
-                icon: Icon(
-                  Icons.logout,
-                  size: screenWidth * 0.05,
-                ),
+                icon: Icon(Icons.logout, size: screenWidth * 0.05),
                 label: Text(
                   'Logout',
                   style: TextStyle(
@@ -196,11 +246,11 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFD34343), // Menyesuaikan warna merah pada gambar
+                  backgroundColor: const Color(
+                    0xFFD34343,
+                  ), // Menyesuaikan warna merah pada gambar
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    vertical: screenHeight * 0.018,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(screenWidth * 0.04),
                   ),

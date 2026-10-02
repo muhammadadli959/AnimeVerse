@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../data/dummy_data.dart';
+
 class GenreList extends StatelessWidget {
-  final List<String> genres = const [
-    "All",
-    "Action",
-    "Adventure",
-    "Comedy",
-    "Drama",
-    "Fantasy",
-    "Horror",
-    "Mystery",
-    "Romance",
-    "Sci-Fi",
-    "Slice of Life",
-  ];
+  List<String> get genres {
+    final availableGenres =
+        DummyData.animeList
+            .expand((anime) => anime.genre.split(','))
+            .map((genre) => genre.trim())
+            .where((genre) => genre.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+    return ['All', ...availableGenres];
+  }
 
   final String selected;
   final ValueChanged<String>? onGenreSelected;
 
-  const GenreList({
-    super.key,
-    this.selected = "All",
-    this.onGenreSelected,
-  });
+  const GenreList({super.key, this.selected = "All", this.onGenreSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +39,7 @@ class GenreList extends StatelessWidget {
             padding: EdgeInsets.only(right: screenWidth * 0.06),
             child: InkWell(
               borderRadius: BorderRadius.circular(screenWidth * 0.06),
-              onTap: () {
-                // TODO: Update the selected genre and filter the anime list accordingly
-              },
+              onTap: () => onGenreSelected?.call(genre),
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.06,
@@ -74,7 +68,6 @@ class GenreList extends StatelessWidget {
             ),
           );
         }).toList(),
-
       ),
     );
   }
